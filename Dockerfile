@@ -1,6 +1,13 @@
 FROM python:alpine3.19
 LABEL author="Maksim.A"
 
-COPY
+COPY requirements.txt requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["top", "-b"]
+COPY source/ /app/
+
+WORKDIR /app/
+
+EXPOSE 80, 443
+
+ENTRYPOINT ["python", "source"]
