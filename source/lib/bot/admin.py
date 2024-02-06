@@ -67,10 +67,24 @@ class Admin:
 
     async def add_description(self, message: types.Message, state: FSMContext):
         await state.update_data(description=message.text)
+        await state.set_state(Film.add_source_url)
+        await message.answer('Добавить ссылку reels/shorts?', reply_markup=yes_no_keyboard)
+
+    async def no_description(self, message: types.Message, state: FSMContext):
+        await state.set_state(Film.add_source_url)
+        await message.answer('Добавить ссылку reels/shorts?', reply_markup=yes_no_keyboard)
+
+    async def yes_source_url(self, message: types.Message, state: FSMContext):
+        await state.set_state(Film.source_url)
+        await message.answer('Введи ссылку reels/shorts')
+
+    async def add_source_url(self, message: types.Message, state: FSMContext):
+        await state.update_data(source_url=message.text)
         await state.set_state(Film.add_links_view)
         await message.answer('Добавить ссылки для просмотра?', reply_markup=yes_no_keyboard)
 
-    async def no_description(self, message: types.Message, state: FSMContext):
+    async def no_source_url(self, message: types.Message, state: FSMContext):
+        await state.get_data()
         await state.set_state(Film.add_links_view)
         await message.answer('Добавить ссылки для просмотра?', reply_markup=yes_no_keyboard)
 
@@ -79,30 +93,16 @@ class Admin:
         await message.answer('Введи ссылки на просмотр через пробел')
 
     async def add_links_view(self, message: types.Message, state: FSMContext):
-        await state.update_data(links=message.text.split(' '))
-        await state.set_state(Film.add_source_url)
-        await message.answer('Добавить ссылку reals/shorts?', reply_markup=yes_no_keyboard)
-
-    async def no_links_view(self, message: types.Message, state: FSMContext):
-        await state.set_state(Film.add_source_url)
-        await message.answer('Добавить ссылку reals/shorts?', reply_markup=yes_no_keyboard)
-
-    async def yes_source_url(self, message: types.Message, state: FSMContext):
-        await state.set_state(Film.source_url)
-        await message.answer('Введи ссылку reals/shorts')
-
-    async def add_source_url(self, message: types.Message, state: FSMContext):
-        data = await state.update_data(source_url=message.text)
+        data = await state.update_data(links=message.text.split(' '))
         await state.clear()
         await self.add_data(message, data)
 
-    async def no_source_url(self, message: types.Message, state: FSMContext):
+    async def no_links_view(self, message: types.Message, state: FSMContext):
         data = await state.get_data()
         await state.clear()
         await self.add_data(message, data)
 
-    async def add_data(self, message: types.Message, data: dict[str, Any]) -> Films:
-        print(data)
+    async def add_data(self, message: types.Message, data: dict[str, Any]) -> None:
         film = Films(
             code=int(data['code']),
             title=data['title'],
@@ -120,7 +120,7 @@ class Admin:
         if film.links_view:
             text += f'Ссылки для просмотра: {", ".join(film.links_view)}\n'
         if film.source_url:
-            text += f'Ссылка shorts/reals: {film.source_url}\n'
+            text += f'Ссылка shorts/reels: {film.source_url}\n'
 
         await message.answer(text, reply_markup=ReplyKeyboardRemove())
 
@@ -153,7 +153,7 @@ class Admin:
         admin_filter = AdminFilter(self.postgres, self.logger)
         router.message.filter(admin_filter)
         router.message.register(self.add_film, Command('add'), admin_filter)
-        router.message.register(self.delete_film, Command('del'))
+        router.message.register(self.delete_film, Command('del'), admin_filter)
         router.message.register(self.cancel_handler, Command('cancel'), F.text.casefold() == "cancel")
         router.message.register(self.add_code, Film.code, CodeFilter(self.logger))
         router.message.register(self.add_title, Film.title)

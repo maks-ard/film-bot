@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 from aiogram.filters import CommandStart
 
-from lib.bot.filters import CodeFilter, AdminFilter
+from lib.bot.filters import CodeFilter, AdminFilter, PubFilter
 from lib.models import Users
 from lib.postgres import Postgres
 
@@ -79,7 +79,7 @@ class Client:
         router = Router(name='client')
 
         router.message.register(self.start_command, CommandStart())
-        router.message.register(self.get_film, CodeFilter(self.logger))
+        router.message.register(self.get_film, CodeFilter(self.logger), PubFilter(self.logger))
         router.message.register(self.other_text)  # Be last!!!
 
         return router

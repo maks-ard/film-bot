@@ -8,6 +8,6 @@ COPY source/ /app/
 
 WORKDIR /app/
 
-EXPOSE 80, 443
+EXPOSE 80
 
-ENTRYPOINT ["python", "source"]
+ENTRYPOINT ["python", "__main__.py"]

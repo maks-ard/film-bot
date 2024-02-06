@@ -15,11 +15,12 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class Users(Base):
     __tablename__ = "users"
+
     user_id: Mapped[int] = mapped_column(BIGINT, unique=True, primary_key=True)
     is_bot: Mapped[bool] = mapped_column(default=False)
     first_name: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     last_name: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
-    username: Mapped[str] = mapped_column(VARCHAR(32))
+    username: Mapped[str] = mapped_column(VARCHAR(32), nullable=True)
     language_code: Mapped[str] = mapped_column(VARCHAR(5))
     is_premium: Mapped[bool] = mapped_column(nullable=True)
     is_admin: Mapped[bool] = mapped_column(default=False)
@@ -27,8 +28,9 @@ class Users(Base):
 
 class Films(Base):
     __tablename__ = "films"
+
     code: Mapped[int] = mapped_column(SMALLINT(), unique=True, primary_key=True)
     title: Mapped[str] = mapped_column(VARCHAR(150))
-    description: Mapped[str] = mapped_column(VARCHAR(300), nullable=True)
+    description: Mapped[str] = mapped_column(VARCHAR(), nullable=True)
     links_view: Mapped[list[str]] = mapped_column(ARRAY(VARCHAR()), nullable=True)
     source_url: Mapped[str] = mapped_column(nullable=True)

@@ -3,6 +3,8 @@ from logging import Logger
 from aiogram import Router
 from aiogram.filters import Filter
 from aiogram.types import Message
+from aiogram.types.chat_member_left import ChatMemberLeft
+from aiogram.types.chat_member_member import ChatMemberMember
 
 from lib.postgres import Postgres
 
@@ -35,3 +37,21 @@ class CodeFilter(Filter):
         is_digit = message.text.isdigit()
         self.logger.debug(f'Message {message.text} is number: {is_digit}')
         return is_digit and len(message.text) < 5
+
+
+class PubFilter(Filter):
+    def __init__(self, logger: Logger) -> None:
+        self.logger = logger
+
+    async def __call__(self, message: Message) -> bool:
+        user_channel_status_movienightee = await message.bot.get_chat_member(
+            chat_id='@movienightee',
+            user_id=message.from_user.id
+        )
+
+        if isinstance(user_channel_status_movienightee, ChatMemberMember):
+            return True
+        await message.answer(
+            'Для получения фильма нужно быть подписанным на @movienightee'
+        )
+        return False
