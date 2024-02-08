@@ -11,9 +11,8 @@ on:
       - master
 
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
       - name: build image
-        uses: echo Hello ci cd!
+        uses: actions/checkout@v3
