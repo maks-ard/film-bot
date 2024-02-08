@@ -1,14 +1,14 @@
 name: Film Bot CI
 
-#on:
-#  push:
-#    tags:
-#      - '[0-9]+\.[0-9]+\.[0-9]+'
-
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'
+
+#on:
+#  push:
+#    branches:
+#      - master
 
 jobs:
   build:
@@ -19,4 +19,4 @@ jobs:
 #      - name: push image
 #        run: docker push maksard99/film-bot:<version>
       - name: test
-        run: echo $CI
+        run: echo $GITHUB_REF_TYPE
