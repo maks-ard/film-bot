@@ -14,6 +14,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: build image
-#        uses: actions/checkout@v3
-        run: docker info
+#      - name: build image
+#        run: docker build -t maksard99/film-bot:<version> .
+#      - name: push image
+#        run: docker push maksard99/film-bot:<version>
+      - name: test
+        run: printenv
