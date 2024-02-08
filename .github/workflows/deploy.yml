@@ -19,4 +19,4 @@ jobs:
 #      - name: push image
 #        run: docker push maksard99/film-bot:<version>
       - name: test
-        run: echo $GITHUB_REF_NAME
+        run: echo $RELEASE_VERSION
