@@ -1,0 +1,14 @@
+name: Film Bot CI
+
+
+on:
+  push:
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: build image
+        uses: echo Hello ci cd!
