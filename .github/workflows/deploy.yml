@@ -9,7 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: build image
-        run: docker build -t maksard99/film-bot:$RELEASE_VERSION .
-      - name: push image
-        run: docker push maksard99/film-bot:$RELEASE_VERSION
+      - name: test
+        run: echo $GIT_TAG_NAME
+#      - name: build image
+#        run: docker build -t maksard99/film-bot:$RELEASE_VERSION .
+#      - name: push image
+#        run: docker push maksard99/film-bot:$RELEASE_VERSION
