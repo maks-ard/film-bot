@@ -1,11 +1,14 @@
+import json
 from logging import Logger
 
+import aiofiles
 from aiogram import Router
 from aiogram.filters import Filter
 from aiogram.types import Message
-from aiogram.types.chat_member_left import ChatMemberLeft
 from aiogram.types.chat_member_member import ChatMemberMember
+from aiogram.types.chat_member_administrator import ChatMemberAdministrator
 
+from lib.bot.keyboards import pubs_inline_keyboard
 from lib.postgres import Postgres
 
 router = Router()
@@ -44,14 +47,35 @@ class PubFilter(Filter):
         self.logger = logger
 
     async def __call__(self, message: Message) -> bool:
-        user_channel_status_movienightee = await message.bot.get_chat_member(
-            chat_id='@movienightee',
-            user_id=message.from_user.id
-        )
+        channels = [
+            {
+                "name": "Фильмы | Сериалы | Мультфильмы",
+                "url": "https://t.me/movienightee",
+                "chat_id": "@movienightee"
+            },
+            {
+                "name": "ВБ МАНИЯ",
+                "url": "https://t.me/WildBMania",
+                "chat_id": "@WildBMania"
+            }
+        ]
 
-        if isinstance(user_channel_status_movienightee, ChatMemberMember):
-            return True
-        await message.answer(
-            'Для получения фильма нужно быть подписанным на @movienightee'
-        )
-        return False
+        keyboard = pubs_inline_keyboard(channels)
+
+        for channel in channels:
+            user_channel_status = await message.bot.get_chat_member(
+                chat_id=channel.get('chat_id'),
+                user_id=message.from_user.id
+            )
+
+            if not isinstance(user_channel_status, (ChatMemberMember, ChatMemberAdministrator)):
+                await message.answer(
+                    'Для пользования ботом нужно быть подписанным на каналы:',
+                    reply_markup=keyboard
+                )
+                return False
+        return True
+
+
+
+
