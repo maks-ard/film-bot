@@ -1,12 +1,11 @@
-import json
 from logging import Logger
 
-import aiofiles
 from aiogram import Router
 from aiogram.filters import Filter
 from aiogram.types import Message
 from aiogram.types.chat_member_member import ChatMemberMember
 from aiogram.types.chat_member_administrator import ChatMemberAdministrator
+from aiogram.types.chat_member_owner import ChatMemberOwner
 
 from lib.bot.keyboards import pubs_inline_keyboard
 from lib.postgres import Postgres
@@ -68,7 +67,7 @@ class PubFilter(Filter):
                 user_id=message.from_user.id
             )
 
-            if not isinstance(user_channel_status, (ChatMemberMember, ChatMemberAdministrator)):
+            if not isinstance(user_channel_status, (ChatMemberMember, ChatMemberAdministrator, ChatMemberOwner)):
                 await message.answer(
                     'Для пользования ботом нужно быть подписанным на каналы:',
                     reply_markup=keyboard
