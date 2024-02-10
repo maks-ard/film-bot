@@ -34,7 +34,7 @@ jobs:
       - name: Connect and run script
         uses: appleboy/ssh-action@v1.0.3
         env:
-          TEST: TEST_ENV
+          TEST: "TEST_ENV"
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
