@@ -15,7 +15,7 @@ jobs:
       - name: set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: docker login
-        run: docker login -u=${{ env.DOCKER_LOGIN }} --p=${{ env.DOCKER_PASSWORD }}
+        run: docker login -u=${{ env.DOCKER_LOGIN }} -p=${{ env.DOCKER_PASSWORD }}
       - name: build image
         run: docker build -t ${{ env.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION .
       - name: push image
