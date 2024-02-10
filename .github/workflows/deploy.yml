@@ -40,7 +40,7 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          env: RELEASE_VERSION, TEST
+          env: TEST
           script_stop: true
           script: |
             echo "I am $TEST"
