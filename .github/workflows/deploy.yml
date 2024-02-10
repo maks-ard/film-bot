@@ -32,7 +32,14 @@ jobs:
       - name: set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Connect and run script
-        run: |
-          ssh root@${{ secrets.HOST }}
-          cd /
-          ls
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          env: RELEASE_VERSION,SERVICE_NAME
+          script_stop: true
+          script: |
+            docker stop $SERVICE_NAME
+            docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
