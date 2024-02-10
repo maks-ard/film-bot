@@ -40,5 +40,5 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script_stop: true
           script: |
-            docker stop film-bot
+            docker stop $SERVICE_NAME
             docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
