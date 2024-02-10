@@ -23,3 +23,25 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION .
       - name: push image
         run: docker push ${{ secrets.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Server
+    needs:
+      - build
+    steps:
+      - name: set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: connect server
+        run: |
+          ssh root@${{ secrets.HOST }}
+          ${{ secrets.ROOT_PASSWORD }}
+      - name: stop service
+        run: docker stop $SERVICE_NAME
+      - name: start service
+        run: | 
+          docker run 
+          --env-file=/home/.env-film-bot 
+          --name=$SERVICE_NAME 
+          -d 
+          --rm 
+          maksard99/$SERVICE_NAME:$RELEASE_VERSION
