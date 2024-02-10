@@ -38,8 +38,10 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          env: RELEASE_VERSION,SERVICE_NAME
+          env: RELEASE_VERSION
           script_stop: true
           script: |
-            docker stop $SERVICE_NAME
-            docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
+            echo "I am $RELEASE_VERSION"
+            echo "I am $SERVICE_NAME"
+#            docker stop $SERVICE_NAME
+#            docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
