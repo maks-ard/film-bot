@@ -18,6 +18,6 @@ jobs:
       - name: docker login
         run: docker login -u=${{ secrets.DOCKER_LOGIN }} -p=${{ secrets.DOCKER_PASSWORD }}
       - name: build image
-        run: docker build -t ${{ env.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION .
+        run: docker build -t ${{ secrets.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION .
       - name: push image
-        run: docker push ${{ env.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/$SERVICE_NAME:$RELEASE_VERSION
