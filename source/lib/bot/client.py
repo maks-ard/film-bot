@@ -55,7 +55,6 @@ async def help_command(message: Message):
     if is_admin:
         commands = {
             "/add": "Добавить фильм в БД",
-            "/cancel": "Отменить добавление фильма",
             "/del XXXX": "Удалить фильм из БД",
             "/all": "Посмотреть все фильмы из БД",
             "/help": "Выводить это сообщение"
