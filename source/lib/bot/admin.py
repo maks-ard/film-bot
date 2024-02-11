@@ -1,6 +1,5 @@
 import logging
 import os
-from logging import Logger
 from typing import Any
 
 from aiogram import Router, F
@@ -70,7 +69,8 @@ async def delete_film(message: types.Message):
         logger.error(ex)
 
 
-@router.message(Command('cancel'), F.text.casefold() == "cancel")
+@router.message(Command("cancel"))
+@router.message(F.text.casefold() == "cancel")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
@@ -79,10 +79,7 @@ async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     logger.info("Cancelling state %r", current_state)
 
     await state.clear()
-    await message.answer(
-        "Cancelled.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
+    await message.answer("Добавление фильма отменено", reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(Film.code, CodeFilter(logger))

@@ -15,7 +15,7 @@ from pythonjsonlogger import jsonlogger
 from lib.bot.middleware import LogMessageMiddleware
 from lib.postgres import Postgres
 from lib.bot.admin import router as admin_router
-from lib.bot.client import Client
+from lib.bot.client import router as client_router
 
 
 class Service:
@@ -32,7 +32,7 @@ class Service:
 
         self.dp.message.outer_middleware.register(LogMessageMiddleware(self.logger))
         self.dp.include_router(admin_router)
-        self.dp.include_router(Client(self.postgres, self.logger).register())
+        self.dp.include_router(client_router)
 
         self.logger.info('Start polling')
         await self.dp.start_polling(self.bot, logger=self.logger)
