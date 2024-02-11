@@ -10,7 +10,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardRemove
 
 from lib.bot.filters import AdminFilter, CodeFilter
-from lib.bot.keyboards import yes_no_keyboard
+from lib.bot.keyboards import yes_no_keyboard, yes_no_cancel_keyboard, AnswerCallback, cancel_keyboard
 from lib.models import Films
 from lib.postgres import Postgres
 
@@ -35,7 +35,7 @@ admin_filter = AdminFilter(postgres, logger)
 @router.message(Command('add'), admin_filter)
 async def add_film(message: types.Message, state: FSMContext):
     await state.set_state(Film.code)
-    await message.answer('Введи код фильма')
+    await message.answer('Введи код фильма', reply_markup=cancel_keyboard())
 
 
 @router.message(Command('all'), admin_filter)
@@ -69,9 +69,8 @@ async def delete_film(message: types.Message):
         logger.error(ex)
 
 
-@router.message(Command("cancel"))
-@router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: types.Message, state: FSMContext) -> None:
+@router.callback_query(AnswerCallback.filter(F.answer == 'cancel'))
+async def cancel_handler(query: types.CallbackQuery, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -79,7 +78,7 @@ async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     logger.info("Cancelling state %r", current_state)
 
     await state.clear()
-    await message.answer("Добавление фильма отменено", reply_markup=ReplyKeyboardRemove())
+    await query.message.edit_text("Добавление фильма отменено")
 
 
 @router.message(Film.code, CodeFilter(logger))
@@ -90,76 +89,78 @@ async def add_code(message: types.Message, state: FSMContext):
         return
     await state.update_data(code=message.text)
     await state.set_state(Film.title)
-    await message.answer('Введи название фильма')
+    await message.answer('Введи название фильма', reply_markup=cancel_keyboard())
 
 
 @router.message(Film.title)
 async def add_title(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
     await state.set_state(Film.add_description)
-    await message.answer('Добавить описание?', reply_markup=yes_no_keyboard)
+    await message.answer('Добавить описание?', reply_markup=yes_no_cancel_keyboard())
 
 
-@router.message(Film.add_description, F.text.casefold() == 'да')
-async def yes_description(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_description, AnswerCallback.filter(F.answer == 'yes'))
+async def yes_description(query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Film.description)
-    await message.answer('Введи описание')
+    await query.message.edit_text('Введи описание')
 
 
 @router.message(Film.description)
 async def add_description(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
     await state.set_state(Film.add_source_url)
-    await message.answer('Добавить ссылку reels/shorts?', reply_markup=yes_no_keyboard)
+    await message.answer('Добавить ссылку reels/shorts?', reply_markup=yes_no_cancel_keyboard())
 
 
-@router.message(Film.add_description, F.text.casefold() == 'нет')
-async def no_description(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_description, AnswerCallback.filter(F.answer == 'no'))
+async def no_description(query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Film.add_source_url)
-    await message.answer('Добавить ссылку reels/shorts?', reply_markup=yes_no_keyboard)
+    await query.message.edit_text('Добавить ссылку reels/shorts?', reply_markup=yes_no_cancel_keyboard())
 
 
-@router.message(Film.add_source_url, F.text.casefold() == 'да')
-async def yes_source_url(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_source_url, AnswerCallback.filter(F.answer == 'yes'))
+async def yes_source_url(query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Film.source_url)
-    await message.answer('Введи ссылку reels/shorts')
+    await query.message.edit_text('Введи ссылку reels/shorts')
 
 
 @router.message(Film.source_url)
 async def add_source_url(message: types.Message, state: FSMContext):
     await state.update_data(source_url=message.text)
     await state.set_state(Film.add_links_view)
-    await message.answer('Добавить ссылки для просмотра?', reply_markup=yes_no_keyboard)
+    await message.answer('Добавить ссылки для просмотра?', reply_markup=yes_no_cancel_keyboard())
 
 
-@router.message(Film.add_source_url, F.text.casefold() == 'нет')
-async def no_source_url(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_source_url, AnswerCallback.filter(F.answer == 'no'))
+async def no_source_url(query: types.CallbackQuery, state: FSMContext):
     await state.get_data()
     await state.set_state(Film.add_links_view)
-    await message.answer('Добавить ссылки для просмотра?', reply_markup=yes_no_keyboard)
+    await query.message.edit_text('Добавить ссылки для просмотра?', reply_markup=yes_no_cancel_keyboard())
 
 
-@router.message(Film.add_links_view, F.text.casefold() == 'да')
-async def yes_links_view(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_links_view, AnswerCallback.filter(F.answer == 'yes'))
+async def yes_links_view(query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Film.links_view)
-    await message.answer('Введи ссылки на просмотр через пробел')
+    await query.message.edit_text('Введи ссылки на просмотр через пробел')
 
 
 @router.message(Film.links_view)
 async def add_links_view(message: types.Message, state: FSMContext):
     data = await state.update_data(links=message.text.split(' '))
     await state.clear()
-    await add_data(message, data)
+    text = await add_data(message, data)
+    await message.answer(text)
 
 
-@router.message(Film.add_links_view, F.text.casefold() == 'нет')
-async def no_links_view(message: types.Message, state: FSMContext):
+@router.callback_query(Film.add_links_view, AnswerCallback.filter(F.answer == 'no'))
+async def no_links_view(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.clear()
-    await add_data(message, data)
+    text = await add_data(query, data)
+    await query.message.edit_text(text)
 
 
-async def add_data(message: types.Message, data: dict[str, Any]) -> None:
+async def add_data(callback: types.Message | types.CallbackQuery, data: dict[str, Any]) -> str:
     film = Films(
         code=int(data['code']),
         title=data['title'],
@@ -179,4 +180,4 @@ async def add_data(message: types.Message, data: dict[str, Any]) -> None:
     if film.source_url:
         text += f'Ссылка shorts/reels: {film.source_url}\n'
 
-    await message.answer(text, reply_markup=ReplyKeyboardRemove())
+    return text
