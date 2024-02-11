@@ -43,7 +43,7 @@ async def start_command(message: Message):
         await postgres.insert(user)
         await message.bot.send_message(
             5668716249,
-            f'Боту написал новый пользователь: {hbold(from_user.username)}'
+            f'Боту написал новый пользователь: {hbold(from_user.first_name)}'
         )
     await message.answer(f"Привет, {hbold(message.from_user.full_name)}!\nПришли код фильма!")
 
