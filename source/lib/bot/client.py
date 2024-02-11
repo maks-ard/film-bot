@@ -4,7 +4,7 @@ import os
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 
 from lib.bot.filters import CodeFilter, PubFilter
 from lib.models import Users
@@ -46,6 +46,25 @@ async def start_command(message: Message):
             f'Боту написал новый пользователь: {hbold(from_user.username)}'
         )
     await message.answer(f"Привет, {hbold(message.from_user.full_name)}!\nПришли код фильма!")
+
+
+@router.message(Command('help'))
+async def help_command(message: Message):
+    is_admin = await postgres.get_admin(message.from_user.id)
+    if is_admin:
+        commands = {
+            "/add": "Добавить фильм в БД",
+            "/cancel": "Отменить добавление фильма",
+            "/del XXXX": "Удалить фильм из БД",
+            "/all": "Посмотреть все фильмы из БД",
+            "/help": "Выводить это сообщение"
+        }
+
+        text = '\n'.join([f"{command} - {description}" for command, description in commands.items()])
+
+        await message.answer(f'Команды для управления админкой:\n{text}')
+    else:
+        await message.answer("Чтобы получить название фильма, напиши код")
 
 
 @router.message(CodeFilter(logger), PubFilter(logger))
