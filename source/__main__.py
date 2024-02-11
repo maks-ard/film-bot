@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import argparse
 import asyncio
 import logging
@@ -6,12 +10,11 @@ from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from dotenv import load_dotenv
 from pythonjsonlogger import jsonlogger
 
 from lib.bot.middleware import LogMessageMiddleware
 from lib.postgres import Postgres
-from lib.bot.admin import Admin
+from lib.bot.admin import router as admin_router
 from lib.bot.client import Client
 
 
@@ -28,7 +31,7 @@ class Service:
         # await self.postgres.create_tables()
 
         self.dp.message.outer_middleware.register(LogMessageMiddleware(self.logger))
-        self.dp.include_router(Admin(self.postgres, self.logger).register())
+        self.dp.include_router(admin_router)
         self.dp.include_router(Client(self.postgres, self.logger).register())
 
         self.logger.info('Start polling')
@@ -82,8 +85,6 @@ def _parse_args():
 
 
 if __name__ == "__main__":
-    load_dotenv()
-
     _args = _parse_args().parse_args()
     _logger = _get_logger(_args.loglevel)
 

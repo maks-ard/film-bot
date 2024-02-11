@@ -17,8 +17,10 @@ class Postgres:
         self.engine = create_async_engine(self.url, echo=False)
         self.async_session = async_sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)
 
-    async def __scalar(self, statement):
+    async def __scalar(self, statement, many=False):
         async with self.async_session() as session:
+            if many:
+                return await session.scalars(statement)
             return await session.scalar(statement)
 
     async def insert(self, model):
@@ -45,6 +47,10 @@ class Postgres:
         else:
             stmt = select(Films.title).where(Films.code == code)
         return await self.__scalar(stmt)
+
+    async def get_all_films(self) -> list[Films]:
+        stmt = select(Films)
+        return await self.__scalar(stmt, many=True)
 
     async def delete_film(self, film: Films):
         await self.delete(film)

@@ -34,3 +34,6 @@ class Films(Base):
     description: Mapped[str] = mapped_column(VARCHAR(), nullable=True)
     links_view: Mapped[list[str]] = mapped_column(ARRAY(VARCHAR()), nullable=True)
     source_url: Mapped[str] = mapped_column(nullable=True)
+
+    def __str__(self):
+        return f"{self.code} - {self.title}"
