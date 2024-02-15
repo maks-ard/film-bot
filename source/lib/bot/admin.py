@@ -7,10 +7,9 @@ from aiogram.filters import Command
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import ReplyKeyboardRemove
 
 from lib.bot.filters import AdminFilter, CodeFilter
-from lib.bot.keyboards import yes_no_keyboard, yes_no_cancel_keyboard, AnswerCallback, cancel_keyboard
+from lib.bot.keyboards import yes_no_cancel_keyboard, AnswerCallback, cancel_keyboard
 from lib.models import Films
 from lib.postgres import Postgres
 
@@ -67,6 +66,12 @@ async def delete_film(message: types.Message):
     except Exception as ex:
         await message.answer('Непредвиденная ошибка удаления фильма!')
         logger.error(ex)
+
+
+@router.message(Command('count_users'))
+async def count_users(message: types.Message):
+    users = await postgres.get_count_users()
+    await message.answer(f"{users} пользователей")
 
 
 @router.callback_query(AnswerCallback.filter(F.answer == 'cancel'))

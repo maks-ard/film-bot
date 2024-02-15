@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 from sqlalchemy import select
+from sqlalchemy import func
 
 from lib.models import Base, Users, Films
 
@@ -35,6 +36,10 @@ class Postgres:
 
     async def get_user(self, user_id: int):
         stmt = select(Users.user_id).where(Users.user_id == user_id)
+        return await self.__scalar(stmt)
+
+    async def get_count_users(self):
+        stmt = select(func.count()).select_from(Users)
         return await self.__scalar(stmt)
 
     async def get_admin(self, user_id: int):
