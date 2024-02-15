@@ -19,5 +19,12 @@ class LogMessageMiddleware(BaseMiddleware):
             'username': event.from_user.username,
             'user_id': event.from_user.id
         })
+        try:
+            await event.bot.send_message(-4192391002, f"{event.from_user.first_name}: {event.text}")
+        except:
+            self.logger.error('Error forward message', extra={
+                "type_event": type(event),
+                "event": str(event)
+            })
 
         return await handler(event, data)
