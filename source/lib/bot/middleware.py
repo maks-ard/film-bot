@@ -8,7 +8,7 @@ from aiogram.types import Message
 class LogMessageMiddleware(BaseMiddleware):
     def __init__(self, logger: Logger) -> None:
         self.logger = logger
-        self.chat_id = -4192391002
+        self.chat_id = -1002050723063
 
     async def __call__(
             self,
