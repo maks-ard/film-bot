@@ -8,6 +8,7 @@ from aiogram.types import Message
 class LogMessageMiddleware(BaseMiddleware):
     def __init__(self, logger: Logger) -> None:
         self.logger = logger
+        self.chat_id = -4192391002
 
     async def __call__(
             self,
@@ -20,7 +21,8 @@ class LogMessageMiddleware(BaseMiddleware):
             'user_id': event.from_user.id
         })
         try:
-            await event.bot.send_message(-4192391002, f"{event.from_user.first_name}: {event.text}")
+            if event.chat.id != self.chat_id:
+                await event.bot.send_message(self.chat_id, f"{event.from_user.first_name}: {event.text}")
         except:
             self.logger.error('Error forward message', extra={
                 "type_event": type(event),
