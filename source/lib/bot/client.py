@@ -65,7 +65,16 @@ async def help_command(message: Message):
 
         await message.answer(f'Команды для управления админкой:\n{text}')
     else:
-        await message.answer("Чтобы получить название фильма, напиши код")
+        await message.answer(
+            "Чтобы получить название фильма, напиши код\nДля просмотра всех кодов используйте команду /all"
+        )
+
+
+@router.message(Command('all'))
+async def get_all_films(message: Message):
+    films = await postgres.get_all_films()
+    text = '\n'.join([str(film) for film in films])
+    await message.answer(text)
 
 
 @router.message(CodeFilter(logger), PubFilter(logger))
@@ -97,4 +106,4 @@ async def other_text(message: Message):
         'user': message.from_user.username,
         'text': message.text
     })
-    await message.answer('Напиши код фильма из 4х цифр')
+    await message.answer('Напиши код фильма до 4х цифр!')

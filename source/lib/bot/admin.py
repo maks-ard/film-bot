@@ -37,13 +37,6 @@ async def add_film(message: types.Message, state: FSMContext):
     await message.answer('Введи код фильма', reply_markup=cancel_keyboard())
 
 
-@router.message(Command('all'), admin_filter)
-async def get_all_films(message: types.Message):
-    films = await postgres.get_all_films()
-    text = '\n'.join([str(film) for film in films])
-    await message.answer(text)
-
-
 @router.message(Command('del'), admin_filter)
 async def delete_film(message: types.Message):
     logger.info('Try delete film', extra={
