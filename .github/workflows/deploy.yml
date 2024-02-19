@@ -47,7 +47,7 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          env: TEST
+          envs: FOO, BAR, SHA
           script_stop: true
           script: |
             echo "I am $FOO"
