@@ -39,7 +39,9 @@ jobs:
       - name: Connect and run script
         uses: appleboy/ssh-action@v1.0.3
         env:
-          TEST: "TEST_ENV"
+          FOO: "BAR"
+          BAR: "FOO"
+          SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
@@ -48,6 +50,8 @@ jobs:
           env: TEST
           script_stop: true
           script: |
-            echo "I am $TEST"
-            docker stop $SERVICE_NAME
-            docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
+            echo "I am $FOO"
+            echo "I am $BAR"
+            echo "sha: $SHA"
+#            docker stop $SERVICE_NAME
+#            docker run --env-file=/home/.env-film-bot --name=$SERVICE_NAME -d --rm maksard99/$SERVICE_NAME:$RELEASE_VERSION
