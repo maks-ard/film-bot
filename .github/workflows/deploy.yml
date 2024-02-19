@@ -39,8 +39,8 @@ jobs:
       - name: Connect and run script
         uses: appleboy/ssh-action@v1.0.3
         env:
-          RELEASE_VERSION: $RELEASE_VERSION
-          SERVICE_NAME: $SERVICE_NAME
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          SERVICE_NAME: ${{ env.SERVICE_NAME }}
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
